@@ -11,7 +11,7 @@ const userSchema = new Schema({
     weight: Number,
     gender: String
   }
-});
+}, { timestamps: true, versionKey: false });
 
 const UserModel = mongoose.model('User', userSchema);
 
