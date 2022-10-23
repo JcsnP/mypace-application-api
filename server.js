@@ -2,10 +2,11 @@ const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
 const cors = require('cors');
-const MYPACE_MONGODB = 'mongodb+srv://mypaceadmin:mypaceadmin@cluster0.u4eefo2.mongodb.net/test';
+import { MYPACE_MONGODB } from './mongodbkey';
 
 // import schema
 const User = require('./schemas/User');
+const Paces = require('./schemas/Paces');
 
 mongoose.connect(MYPACE_MONGODB, { useNewUrlParser: true });
 mongoose.connection.on('error', (err) => {
