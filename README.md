@@ -72,7 +72,7 @@ rest api with mongoose
                 "userId": "635541bd018be42ab4056b92",
                 "date": "2022-10-23T20:33:15.000Z",
                 "details": {
-                    "pace": 5749,
+                    "paces": 5749,
                     "kcal": 298.14,
                     "distance": 2456,
                     "mins": 152
