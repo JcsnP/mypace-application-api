@@ -5,7 +5,7 @@ const pacesSchema = new Schema({
   userId: String,
   date: Date,
   details: {
-    pace: String,
+    pace: Number,
     kcal: Number,
     distance: Number,
     mins: Number

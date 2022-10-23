@@ -7,7 +7,7 @@ rest api with mongoose
 
 **ควรใช้ API ควบคู่กับ Postman**
 **สำหรับการ CRUD สามารถใช้ API เส้นเดียวกันได้ แต่ให้เลือก Method ตามความเหมาะสม**
-```http://localhost:9000/user/```
+```http://localhost:9000/users/```
 
 **ข้อมูลตัวอย่างสำหรับการ POST**
 **สำหรับ Password นั้น ให้ทำการ hash ด้วย md5 ก่อน https://www.md5.cz/**
