@@ -102,7 +102,7 @@ app.get('/userPaces', async(req, res) => {
   res.json(userPaces);
 });
 
-const PORT = 9000;
+const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`your server is running in http://localhost:${PORT}`);
 });
