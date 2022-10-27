@@ -123,6 +123,18 @@ app.post('/login', async(req, res) => {
   }
 });
 
+// =============== Authen ===============
+app.post('/authen', async(req, res) => {
+  try {
+    const token = req.headers.authorization.split(' ')[1];
+    var decoded = jwt.verify(token, SECRET);
+    res.json({status: 'ok', decoded});
+  } catch(error) {
+    res.json({status: 'error', message: error.message});
+  }
+  
+});
+
 const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`your server is running in http://localhost:${PORT}`);
