@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
 const MYPACE_MONGODB = process.env.MYPACE_MONGODB;
+const md5 = require('md5');
 
 // import schema
 const Users = require('./schemas/Users');
@@ -20,6 +21,7 @@ app.use(cors());
 // create user
 app.post('/users', async (req, res) => {
   const payload = req.body;
+  payload.password = md5(payload.password);
   const user = new Users(payload);
   await user.save();
   res.status(201).end();
