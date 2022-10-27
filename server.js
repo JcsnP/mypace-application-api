@@ -2,7 +2,8 @@ const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
 const cors = require('cors');
-const MYPACE_MONGODB = require('./mongodbkey');
+require('dotenv').config();
+const MYPACE_MONGODB = process.env.MYPACE_MONGODB;
 
 // import schema
 const Users = require('./schemas/Users');
