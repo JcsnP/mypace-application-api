@@ -5,6 +5,9 @@ const cors = require('cors');
 require('dotenv').config();
 const MYPACE_MONGODB = process.env.MYPACE_MONGODB;
 const md5 = require('md5');
+const jwt = require('jsonwebtoken');
+const SECRET = process.env.SECRET;
+
 
 // import schema
 const Users = require('./schemas/Users');
@@ -21,6 +24,7 @@ app.use(cors());
 // create user
 app.post('/users', async (req, res) => {
   const payload = req.body;
+  // hash raw password to md5
   payload.password = md5(payload.password);
   const user = new Users(payload);
   await user.save();
@@ -103,6 +107,20 @@ app.get('/userPaces', async(req, res) => {
   ]).exec();
 
   res.json(userPaces);
+});
+
+// =============== Login ===============
+app.post('/login', async(req, res) => {
+  const { username, password } = req.body;
+  const user = await Users.findOne({username: username, password: md5(password)});
+  
+  // check if user is in database
+  if(!!user) {
+    var token = jwt.sign({ username: user.username }, SECRET);
+    res.json({status: 'ok', message: 'login success', token});
+  } else {
+    res.json({status: 'error', message: 'user not found'});
+  }
 });
 
 const PORT = 3000;
