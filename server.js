@@ -116,8 +116,18 @@ app.post('/login', async(req, res) => {
   
   // check if user is in database
   if(!!user) {
-    var token = jwt.sign({ username: user.username }, SECRET);
-    res.json({status: 'ok', message: 'login success', token});
+    var token = jwt.sign({
+      id: user._id,
+      username: user.username,
+      password: user.password,
+      information: {
+        age: user.information.age,
+        height: user.information.height,
+        weight: user.information.weight,
+        gender: user.information.gender
+      }
+    }, SECRET);
+    res.json({status: 'ok', message: 'login success', token, user});
   } else {
     res.json({status: 'error', message: 'user not found'});
   }
@@ -127,8 +137,8 @@ app.post('/login', async(req, res) => {
 app.post('/authen', async(req, res) => {
   try {
     const token = req.headers.authorization.split(' ')[1];
-    var decoded = jwt.verify(token, SECRET);
-    res.json({status: 'ok', decoded});
+    var user = jwt.verify(token, SECRET);
+    res.json({status: 'ok', user});
   } catch(error) {
     res.json({status: 'error', message: error.message});
   }
