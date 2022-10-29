@@ -121,7 +121,7 @@ app.post('/login', async(req, res) => {
       username: user.username,
       password: user.password,
       information: {
-        age: user.information.age,
+        dob: user.information.dob,
         height: user.information.height,
         weight: user.information.weight,
         gender: user.information.gender
