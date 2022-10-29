@@ -38,10 +38,15 @@ app.get('/users', async (req, res) => {
 });
 
 // get user details by id
-app.get('/users/:id', async(req, res) => {
-  const { id } = req.params;
-  const user = await Users.findOne({_id: id});
-  res.json(user);
+app.get('/users/me', async(req, res) => {
+  try {
+    const token = req.headers.authorization.split(' ')[1];
+    var iss = jwt.verify(token, SECRET).iss;
+    const user = await Users.findOne({_id: iss});
+    res.json({status: 'ok', user});
+  } catch(error) {
+    res.json({status: 'error', message: 'invalid token'});
+  }
 });
 
 // update user by id
@@ -117,17 +122,10 @@ app.post('/login', async(req, res) => {
   // check if user is in database
   if(!!user) {
     var token = jwt.sign({
-      id: user._id,
+      iss: user._id,
       username: user.username,
-      password: user.password,
-      information: {
-        dob: user.information.dob,
-        height: user.information.height,
-        weight: user.information.weight,
-        gender: user.information.gender
-      }
     }, SECRET);
-    res.json({status: 'ok', message: 'login success', token, user});
+    res.json({status: 'ok', message: 'login success', token});
   } else {
     res.json({status: 'error', message: 'user not found'});
   }
