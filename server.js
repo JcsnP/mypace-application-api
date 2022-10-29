@@ -28,7 +28,7 @@ app.post('/users', async (req, res) => {
   payload.password = md5(payload.password);
   const user = new Users(payload);
   await user.save();
-  res.status(201).end();
+  res.json({ status: 'ok', message: 'user created' });
 });
 
 // get all user
