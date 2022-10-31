@@ -92,7 +92,8 @@ app.get('/paces', async(req, res) => {
 // =============== Get paces per Users ===============
 // recieve user id, then show user information and all paces
 app.get('/userPaces', async(req, res) => {
-  const { id } = req.params;
+  const token = req.headers.authorization.split(' ')[1];
+  var iss = jwt.verify(token, SECRET).iss;
   const userPaces = await Users.aggregate([
     {
       "$addFields": {
@@ -107,6 +108,11 @@ app.get('/userPaces', async(req, res) => {
         'localField': '_id',
         'foreignField': 'userId',
         'as': 'history'
+      }
+    },
+    {
+      "$match": {
+        "_id": iss
       }
     }
   ]).exec();
