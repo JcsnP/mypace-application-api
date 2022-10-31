@@ -29,6 +29,7 @@ app.post('/users', async (req, res) => {
     const existsUser = await Users.findOne({username: payload.username});
     if(existsUser) {
       res.json({ status: 'error', message: 'username is exists' });
+      return;
     }
     // hash raw password to md5
     payload.password = md5(payload.password);
