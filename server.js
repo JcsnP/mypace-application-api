@@ -23,12 +23,21 @@ app.use(cors());
 // =============== Users ===============
 // create user
 app.post('/users', async (req, res) => {
-  const payload = req.body;
-  // hash raw password to md5
-  payload.password = md5(payload.password);
-  const user = new Users(payload);
-  await user.save();
-  res.json({ status: 'ok', message: 'user created' });
+  try {
+    const payload = req.body;
+    // check if user is exists
+    const existsUser = await Users.findOne({username: payload.username});
+    if(existsUser) {
+      res.json({ status: 'error', message: 'username is exists' });
+    }
+    // hash raw password to md5
+    payload.password = md5(payload.password);
+    const user = new Users(payload);
+    await user.save();
+    res.json({ status: 'ok', message: 'user created' });
+  } catch(error) {
+    console.log(error.message);
+  }
 });
 
 // get all user
@@ -49,24 +58,6 @@ app.get('/users/me', async(req, res) => {
   }
 });
 
-// update user by id
-// update specific field, not all
-app.put('/users/:id', async(req, res) => {
-  const payload = req.body;
-  const { id } = req.params;
-
-  await Users.findByIdAndUpdate(id, { $set: payload });
-  res.status(200).end();
-});
-
-// delete user by id
-app.delete('/users/:id', async(req, res) => {
-  const { id } = req.params;
-
-  await Users.findByIdAndDelete(id);
-  res.status(204).end();
-});
-
 // =============== Paces ===============
 // create pace
 app.post('/paces', async(req, res) => {
@@ -81,13 +72,6 @@ app.get('/paces', async(req, res) => {
   const paces = await Paces.find({});
   res.json(paces);
 });
-
-// get paces by id
-
-// update pace by id
-// update specific field, not all
-
-// delete pace by id
 
 // =============== Get paces per Users ===============
 // recieve user id, then show user information and all paces
