@@ -76,7 +76,7 @@ app.get('/paces', async(req, res) => {
 
 // =============== Get paces per Users ===============
 // recieve user id, then show user information and all paces
-app.get('/userPaces', async(req, res) => {
+app.get('/users/paces', async(req, res) => {
   const token = req.headers.authorization.split(' ')[1];
   var iss = jwt.verify(token, SECRET).iss;
   const userPaces = await Users.aggregate([
