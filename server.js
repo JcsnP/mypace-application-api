@@ -77,32 +77,37 @@ app.get('/paces', async(req, res) => {
 // =============== Get paces per Users ===============
 // recieve user id, then show user information and all paces
 app.get('/users/paces', async(req, res) => {
-  const token = req.headers.authorization.split(' ')[1];
-  var iss = jwt.verify(token, SECRET).iss;
-  const userPaces = await Users.aggregate([
-    {
-      "$addFields": {
-        "_id": {
-          "$toString": "$_id"
+  try {
+    const token = req.headers.authorization.split(' ')[1];
+    var iss = jwt.verify(token, SECRET).iss;
+    const userPaces = await Users.aggregate([
+      {
+        "$addFields": {
+          "_id": {
+            "$toString": "$_id"
+          }
+        }
+      },
+      {
+        '$lookup': {
+          'from': Paces.collection.name,
+          'localField': '_id',
+          'foreignField': 'userId',
+          'as': 'history'
+        }
+      },
+      {
+        "$match": {
+          "_id": iss
         }
       }
-    },
-    {
-      '$lookup': {
-        'from': Paces.collection.name,
-        'localField': '_id',
-        'foreignField': 'userId',
-        'as': 'history'
-      }
-    },
-    {
-      "$match": {
-        "_id": iss
-      }
-    }
-  ]).exec();
+    ]).exec();
 
-  res.json(userPaces);
+    // response to caller
+    res.json(userPaces);
+  } catch(error) {
+    res.json({status: 'error', message: error.message});
+  }
 });
 
 // =============== Login ===============
