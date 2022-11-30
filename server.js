@@ -48,6 +48,23 @@ app.post('/users', async (req, res) => {
   }
 });
 
+// =============== Login ===============
+app.post('/login', async(req, res) => {
+  const { username, password } = req.body;
+  const user = await Users.findOne({username: username, password: md5(password)});
+  
+  // check if user is in database
+  if(!!user) {
+    var token = jwt.sign({
+      iss: user._id,
+      username: user.username,
+    }, SECRET);
+    res.json({status: 'ok', message: 'login success', token});
+  } else {
+    res.json({status: 'error', message: 'user not found'});
+  }
+});
+
 // get all user
 app.get('/users', async (req, res) => {
   const user = await Users.find({});
@@ -117,33 +134,17 @@ app.get('/users/paces', async(req, res) => {
   }
 });
 
-// =============== Login ===============
-app.post('/login', async(req, res) => {
-  const { username, password } = req.body;
-  const user = await Users.findOne({username: username, password: md5(password)});
-  
-  // check if user is in database
-  if(!!user) {
-    var token = jwt.sign({
-      iss: user._id,
-      username: user.username,
-    }, SECRET);
-    res.json({status: 'ok', message: 'login success', token});
-  } else {
-    res.json({status: 'error', message: 'user not found'});
-  }
-});
-
-// =============== Authen ===============
-app.post('/authen', async(req, res) => {
+// =============== Update ===============
+app.put('/users/me', async(req, res) => {
   try {
     const token = req.headers.authorization.split(' ')[1];
-    var user = jwt.verify(token, SECRET);
-    res.json({status: 'ok', user});
+    var iss = jwt.verify(token, SECRET).iss;
+    const payload = req.body;
+    await Users.findByIdAndUpdate(iss, {$set: payload});
+    res.json({status: 'ok', message: 'update success'});
   } catch(error) {
-    res.json({status: 'error', message: error.message});
+    res.json({status: 'error', message: 'can\'t update information'});
   }
-  
 });
 
 const PORT = 3000;
