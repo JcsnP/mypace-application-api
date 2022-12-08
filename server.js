@@ -12,6 +12,7 @@ const SECRET = process.env.SECRET;
 // import schema
 const Users = require('./schemas/Users');
 const Paces = require('./schemas/Paces');
+const Badges = require('./schemas/Badges');
 
 mongoose.connect(MYPACE_MONGODB, { useNewUrlParser: true });
 mongoose.connection.on('error', (err) => {
@@ -112,6 +113,25 @@ app.get('/users/paces', async(req, res) => {
   }
 });
 
+app.get('/users/paces/:format', async(req, res) => {
+  try {
+    const { format } = req.params;
+    const token = req.headers.authorization.split(' ')[1];
+    var iss = jwt.verify(token, SECRET).iss;
+    if(format === 'life') {
+      const life = await Paces.find({userId: iss});
+      let all = 0;
+      life.map(item => {
+        all += item.details.paces;
+      })
+      res.json({status: 200, all});
+    }
+    // res.json({format: format});
+  } catch(error) {
+    res.json({status: 'error', message: error.message});
+  }
+});
+
 // =============== Update ===============
 app.put('/users/me', async(req, res) => {
   try {
@@ -123,6 +143,46 @@ app.put('/users/me', async(req, res) => {
   } catch(error) {
     res.json({status: 'error', message: 'can\'t update information'});
   }
+});
+
+// create badges
+app.post('/badges', async(req, res) => {
+  try {
+    const payload = req.body;
+    const badge = new Badges(payload);
+    await badge.save();
+    res.json({status: 201, message: 'create success'});
+  } catch(error) {
+    res.json({status: 'error', message: error.message});
+  }
+});
+
+// get all badges
+app.get('/badges', async(req, res) => {
+  try {
+    const badges = await Badges.find({});
+    if(!!badges) {
+      res.json({status: 200, badges});
+    } else {
+      res.json({status: 204, message: 'no badges'});
+    }
+  } catch (error) {
+    res.json({status: 'error', message: error.message});
+  }
+});
+
+// leaderboard
+app.get('/leaderboard', async(req, res) => {
+  const allPaces = await Paces.find({})
+    .limit(10)
+    .sort({'details.paces': -1})
+    .exec(function(error, result) {
+      if(!error) {
+        res.json({status: 200, result});
+      } else {
+        res.json({status: 204, message: error.message});
+      }
+    });
 });
 
 const PORT = 3000;
