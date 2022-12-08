@@ -98,8 +98,39 @@ app.get('/paces', async(req, res) => {
   res.json(paces);
 });
 
-// =============== Get paces per Users ===============
-// recieve user id, then show user information and all paces
+// get user's paces
+app.get('/users/paces', async(req, res) => {
+  try {
+    const token = req.headers.authorization.split(' ')[1];
+    var iss = jwt.verify(token, SECRET).iss;
+    const userPaces = await Paces.find({userId: iss});
+
+    // response to client
+    res.json({status: 200, history: userPaces});
+  } catch(error) {
+    res.json({status: 'error', message: error.message});
+  }
+});
+
+// =============== Update ===============
+app.put('/users/me', async(req, res) => {
+  try {
+    const token = req.headers.authorization.split(' ')[1];
+    var iss = jwt.verify(token, SECRET).iss;
+    const payload = req.body;
+    await Users.findByIdAndUpdate(iss, {$set: payload});
+    res.json({status: 'ok', message: 'update success'});
+  } catch(error) {
+    res.json({status: 'error', message: 'can\'t update information'});
+  }
+});
+
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`your server is running in http://localhost:${PORT}`);
+});
+
+/*
 app.get('/users/paces', async(req, res) => {
   try {
     const token = req.headers.authorization.split(' ')[1];
@@ -133,21 +164,4 @@ app.get('/users/paces', async(req, res) => {
     res.json({status: 'error', message: error.message});
   }
 });
-
-// =============== Update ===============
-app.put('/users/me', async(req, res) => {
-  try {
-    const token = req.headers.authorization.split(' ')[1];
-    var iss = jwt.verify(token, SECRET).iss;
-    const payload = req.body;
-    await Users.findByIdAndUpdate(iss, {$set: payload});
-    res.json({status: 'ok', message: 'update success'});
-  } catch(error) {
-    res.json({status: 'error', message: 'can\'t update information'});
-  }
-});
-
-const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`your server is running in http://localhost:${PORT}`);
-});
+*/
