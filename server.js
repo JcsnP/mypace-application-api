@@ -132,7 +132,7 @@ app.get('/users/paces/:format', async(req, res) => {
   }
 });
 
-// =============== Update ===============
+// update user's information
 app.put('/users/me', async(req, res) => {
   try {
     const token = req.headers.authorization.split(' ')[1];
@@ -142,6 +142,18 @@ app.put('/users/me', async(req, res) => {
     res.json({status: 'ok', message: 'update success'});
   } catch(error) {
     res.json({status: 'error', message: 'can\'t update information'});
+  }
+});
+
+// get user's badges
+app.get('/users/me/badges', async(req, res) => {
+  try {
+    const token = req.headers.authorization.split(' ')[1];
+    var iss = jwt.verify(token, SECRET).iss;
+    const badge = await Users.findOne({_id: iss});
+    res.json({status: 200, badges: badge.badges});
+  } catch(error) {
+    res.json({status: 'error', message: 'can\'t find user\'s badges'});
   }
 });
 

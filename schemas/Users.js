@@ -10,7 +10,8 @@ const usersSchema = new Schema({
     height: Number,
     weight: Number,
     gender: String
-  }
+  },
+  badges: Array
 }, { timestamps: true, versionKey: false });
 
 const UsersModel = mongoose.model('User', usersSchema);
