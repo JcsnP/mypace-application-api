@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const ObjectId = Schema.ObjectId;
 
 const usersSchema = new Schema({
   username: String,
@@ -11,7 +12,7 @@ const usersSchema = new Schema({
     weight: Number,
     gender: String
   },
-  badges: Array
+  badges: [ObjectId]
 }, { timestamps: true, versionKey: false });
 
 const UsersModel = mongoose.model('User', usersSchema);

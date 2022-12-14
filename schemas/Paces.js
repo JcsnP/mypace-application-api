@@ -1,9 +1,10 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const ObjectId = Schema.ObjectId;
 
 const pacesSchema = new Schema({
-  userId: String,
-  date: Date,
+  userId: ObjectId,
+  date: String,
   details: {
     paces: Number,
     kcal: Number,

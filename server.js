@@ -6,6 +6,8 @@ require('dotenv').config();
 const MYPACE_MONGODB = process.env.MYPACE_MONGODB;
 const md5 = require('md5');
 const jwt = require('jsonwebtoken');
+// var moment = require('moment');
+var moment = require('moment-timezone');
 const SECRET = process.env.SECRET;
 
 
@@ -20,6 +22,7 @@ mongoose.connection.on('error', (err) => {
 });
 app.use(express.json());
 app.use(cors());
+moment.locale('th')
 
  app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
@@ -183,18 +186,37 @@ app.get('/badges', async(req, res) => {
   }
 });
 
-// leaderboard
+
+// ดึงข้อมูลการเดิน สัปดาห์ย้อนหลัง
 app.get('/leaderboard', async(req, res) => {
-  const allPaces = await Paces.find({})
-    .limit(10)
-    .sort({'details.paces': -1})
-    .exec(function(error, result) {
-      if(!error) {
-        res.json({status: 200, result});
-      } else {
-        res.json({status: 204, message: error.message});
+  //  console.log(new Date(moment().subtract(1, 'days')).toLocaleDateString());
+  try {
+    const yesterday_date = await new Date(moment().subtract(1, 'days')).toLocaleDateString();
+    const userPaces = await Paces.aggregate([
+      {
+        '$match': {'date': yesterday_date}
+      },
+      {
+        '$lookup': {
+          'from': Users.collection.name,
+          'localField': 'userId',
+          'foreignField': '_id',
+          'as': 'user'
+        }
       }
-    });
+    ])
+    .project({
+      '_id': 0,
+      'details': 1,
+      'user.username': 1
+    })
+    .sort({'details.paces': -1})
+    .limit(10)
+    .exec();
+    res.json({status: 200, userPaces});
+  } catch(error) {
+    res.json({status: 500, message: error});
+  }
 });
 
 const PORT = 3000;
@@ -235,5 +257,34 @@ app.get('/users/paces', async(req, res) => {
   } catch(error) {
     res.json({status: 'error', message: error.message});
   }
+});
+*/
+
+/*
+const allPaces = await Paces.find({})
+    .where({date: moment().format('L')})
+    .limit(10)
+    .exec(function(error, result) {
+      if(!error) {
+        res.json({status: 200, result});
+      } else {
+        res.json({status: 204, message: error.message});
+      }
+    });
+*/
+
+/*
+// leaderboard
+app.get('/leaderboard', async(req, res) => {
+  const allPaces = await Paces.find({})
+    .limit(10)
+    .sort({'details.paces': -1})
+    .exec(function(error, result) {
+      if(!error) {
+        res.json({status: 200, result});
+      } else {
+        res.json({status: 204, message: error.message});
+      }
+    });
 });
 */
