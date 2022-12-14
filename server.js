@@ -28,8 +28,7 @@ app.use(cors());
   next();
 });
 
-// =============== Users ===============
-// create user
+// สร้างผู้ใช้ใหม่
 app.post('/users', async (req, res) => {
   try {
     const payload = req.body;
@@ -49,7 +48,7 @@ app.post('/users', async (req, res) => {
   }
 });
 
-// =============== Login ===============
+// การล็อกอิน
 app.post('/login', async(req, res) => {
   const { username, password } = req.body;
   const user = await Users.findOne({username: username, password: md5(password)});
@@ -66,13 +65,13 @@ app.post('/login', async(req, res) => {
   }
 });
 
-// get all user
+// ดึงข้อข้อมูลผู้ใช้ทั้งหมด
 app.get('/users', async (req, res) => {
   const user = await Users.find({});
   res.json(user);
 });
 
-// get user details by id
+// ดึงข้อมูลผู้ใช้คนใดคนนึง
 app.get('/users/me', async(req, res) => {
   try {
     const token = req.headers.authorization.split(' ')[1];
@@ -84,8 +83,20 @@ app.get('/users/me', async(req, res) => {
   }
 });
 
-// =============== Paces ===============
-// create pace
+// แก้ไขข้อมูลของผู้ใช้
+app.put('/users/me', async(req, res) => {
+  try {
+    const token = req.headers.authorization.split(' ')[1];
+    var iss = jwt.verify(token, SECRET).iss;
+    const payload = req.body;
+    await Users.findByIdAndUpdate(iss, {$set: payload});
+    res.json({status: 'ok', message: 'update success'});
+  } catch(error) {
+    res.json({status: 'error', message: 'can\'t update information'});
+  }
+});
+
+// สร้างประวัติการเดิน
 app.post('/paces', async(req, res) => {
   const payload = req.body;
   const pace = new Paces(payload);
@@ -93,13 +104,13 @@ app.post('/paces', async(req, res) => {
   res.status(201).end();
 });
 
-// get all paces
+// ดึงข้อมูลการเดินทั้งหมดของผู้ใช้ทุกคน
 app.get('/paces', async(req, res) => {
   const paces = await Paces.find({});
   res.json(paces);
 });
 
-// get user's paces
+// ดึงข้อมูลการเดินของคนใดคนนึง (การเดินทั้งหมด)
 app.get('/users/paces', async(req, res) => {
   try {
     const token = req.headers.authorization.split(' ')[1];
@@ -113,6 +124,8 @@ app.get('/users/paces', async(req, res) => {
   }
 });
 
+// ดึงข้อมูลการเดินตามรูปแบบที่ต้องการ
+// ทั้งหมด, สัปดาห์, วัน
 app.get('/users/paces/:format', async(req, res) => {
   try {
     const { format } = req.params;
@@ -132,20 +145,7 @@ app.get('/users/paces/:format', async(req, res) => {
   }
 });
 
-// update user's information
-app.put('/users/me', async(req, res) => {
-  try {
-    const token = req.headers.authorization.split(' ')[1];
-    var iss = jwt.verify(token, SECRET).iss;
-    const payload = req.body;
-    await Users.findByIdAndUpdate(iss, {$set: payload});
-    res.json({status: 'ok', message: 'update success'});
-  } catch(error) {
-    res.json({status: 'error', message: 'can\'t update information'});
-  }
-});
-
-// get user's badges
+// ดึงข้อมูล badge ของผู้ใช้คนใดคนนึง
 app.get('/users/me/badges', async(req, res) => {
   try {
     const token = req.headers.authorization.split(' ')[1];
@@ -157,7 +157,7 @@ app.get('/users/me/badges', async(req, res) => {
   }
 });
 
-// create badges
+// สร้าง badge
 app.post('/badges', async(req, res) => {
   try {
     const payload = req.body;
@@ -169,7 +169,7 @@ app.post('/badges', async(req, res) => {
   }
 });
 
-// get all badges
+// ดึงข้อมูล badge ทั้งหมด
 app.get('/badges', async(req, res) => {
   try {
     const badges = await Badges.find({});
