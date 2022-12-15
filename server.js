@@ -80,9 +80,9 @@ app.get('/users/me', async(req, res) => {
     const token = req.headers.authorization.split(' ')[1];
     var iss = jwt.verify(token, SECRET).iss;
     const user = await Users.findOne({_id: iss});
-    res.json({status: 'ok', user});
+    res.json({status: 200, user});
   } catch(error) {
-    res.json({status: 'error', message: 'invalid token'});
+    res.json({status: 204, message: 'invalid token', error: error});
   }
 });
 
@@ -93,9 +93,9 @@ app.put('/users/me', async(req, res) => {
     var iss = jwt.verify(token, SECRET).iss;
     const payload = req.body;
     await Users.findByIdAndUpdate(iss, {$set: payload});
-    res.json({status: 'ok', message: 'update success'});
+    res.json({status: 200, message: 'update success'});
   } catch(error) {
-    res.json({status: 'error', message: 'can\'t update information'});
+    res.json({status: 204, message: 'can\'t update information'});
   }
 });
 
