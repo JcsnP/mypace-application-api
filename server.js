@@ -190,12 +190,14 @@ app.get('/badges', async(req, res) => {
 // ดึงข้อมูลการเดิน สัปดาห์ย้อนหลัง
 app.get('/leaderboard', async(req, res) => {
   //  console.log(new Date(moment().subtract(1, 'days')).toLocaleDateString());
+  /*
+    {
+      '$match': {'date': yesterday_date}
+    },
+  */
   try {
     const yesterday_date = await new Date(moment().subtract(1, 'days')).toLocaleDateString();
     const userPaces = await Paces.aggregate([
-      {
-        '$match': {'date': yesterday_date}
-      },
       {
         '$lookup': {
           'from': Users.collection.name,
