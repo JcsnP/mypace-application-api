@@ -101,10 +101,24 @@ app.put('/users/me', async(req, res) => {
 
 // สร้างประวัติการเดิน
 app.post('/paces', async(req, res) => {
-  const payload = req.body;
-  const pace = new Paces(payload);
-  await pace.save();
-  res.status(201).end();
+  try {
+    const token = req.headers.authorization.split(' ')[1];
+    var iss = jwt.verify(token, SECRET).iss;
+
+    const payload = req.body;
+    const pace = new Paces(payload);
+
+    // เช็คก่อนว่าบันทึกไว้แล้วหรือยัง
+    const paced = await Paces.findOne({userId: iss, date: payload.date});
+    if(paced) {
+      return res.json({status: 409, message: 'pace is already saved.'});
+    }
+
+    await pace.save();
+    res.json({status: 200, message: 'pace saved.'});
+  } catch(error) {
+    res.json({status: 204, message: error.message});
+  }
 });
 
 // ดึงข้อมูลการเดินทั้งหมดของผู้ใช้ทุกคน
