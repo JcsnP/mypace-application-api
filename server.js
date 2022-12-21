@@ -15,6 +15,7 @@ const SECRET = process.env.SECRET;
 const Users = require('./schemas/Users');
 const Paces = require('./schemas/Paces');
 const Badges = require('./schemas/Badges');
+const Advices = require('./schemas/Advices');
 
 mongoose.connect(MYPACE_MONGODB, { useNewUrlParser: true });
 mongoose.connection.on('error', (err) => {
@@ -24,7 +25,7 @@ app.use(express.json());
 app.use(cors());
 moment.locale('th')
 
- app.use(function(req, res, next) {
+app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
   res.header("Access-Control-Allow-Headers", "x-access-token, Origin, X-Requested-With, Content-Type, Accept");
@@ -55,7 +56,7 @@ app.post('/users', async (req, res) => {
 app.post('/login', async(req, res) => {
   const { username, password } = req.body;
   const user = await Users.findOne({username: username, password: md5(password)});
-  
+
   // check if user is in database
   if(!!user) {
     var token = jwt.sign({
@@ -232,6 +233,31 @@ app.get('/leaderboard', async(req, res) => {
     res.json({status: 200, userPaces});
   } catch(error) {
     res.json({status: 500, message: error});
+  }
+});
+
+// เพิ่มคำแนะนำ
+app.post('/advices', async(req, res) => {
+  try {
+    const payload = req.body;
+    if(await Advices.findOne({message: payload.message})) {
+      return res.json({status: 409, message: 'advice is already exists'});
+    }
+    const advice = new Advices(payload);
+    await advice.save();
+    res.json({status: 201, message: 'create success'});
+  } catch(error) {
+    res.json({status: 'error', message: error.message});
+  }
+});
+
+// ดึงคำแนะนำทั้งหมด
+app.get('/advices', async(req, res) => {
+  try {
+    const advices = await Advices.find({});
+    res.json({status: 200, advices});
+  } catch(error) {
+    res.json({status: 'error', message: error.message});
   }
 });
 
