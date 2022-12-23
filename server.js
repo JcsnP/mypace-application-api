@@ -16,6 +16,7 @@ const Users = require('./schemas/Users');
 const Paces = require('./schemas/Paces');
 const Badges = require('./schemas/Badges');
 const Advices = require('./schemas/Advices');
+const { count } = require('./schemas/Users');
 
 mongoose.connect(MYPACE_MONGODB, { useNewUrlParser: true });
 mongoose.connection.on('error', (err) => {
@@ -255,7 +256,24 @@ app.post('/advices', async(req, res) => {
 app.get('/advices', async(req, res) => {
   try {
     const advices = await Advices.find({});
-    res.json({status: 200, advices});
+    const count = await Advices.count({});
+    res.json({status: 200, count: count, advices});
+  } catch(error) {
+    res.json({status: 'error', message: error.message});
+  }
+});
+
+// สุ่มคำแนะนำ
+app.get('/advice', async(req, res) => {
+  try {
+    Advices.count().exec((error, count) => {
+      let random = Math.floor(Math.random() * count);
+      Advices.findOne().skip(random).exec(
+        (error, advice) => {
+          res.json({status: 200, count: count, advice});
+        }
+      )
+    })
   } catch(error) {
     res.json({status: 'error', message: error.message});
   }
