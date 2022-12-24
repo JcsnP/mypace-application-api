@@ -16,7 +16,7 @@ const Users = require('./schemas/Users');
 const Paces = require('./schemas/Paces');
 const Badges = require('./schemas/Badges');
 const Advices = require('./schemas/Advices');
-const { count } = require('./schemas/Users');
+const Avatars = require('./schemas/Avatars');
 
 mongoose.connect(MYPACE_MONGODB, { useNewUrlParser: true });
 mongoose.connection.on('error', (err) => {
@@ -38,16 +38,17 @@ app.post('/users', async (req, res) => {
   try {
     const payload = req.body;
     // check if user is exists
-    const existsUser = await Users.findOne({username: payload.username});
-    if(existsUser) {
-      res.json({ status: 'error', message: 'username is exists' });
+    const existsUserName = await Users.findOne({username: payload.username});
+    const existsUserEmail = await Users.findOne({email: payload.email});
+    if(existsUserName || existsUserEmail) {
+      res.json({ status: 204, message: 'username or email is exists' });
       return;
     }
     // hash raw password to md5
     payload.password = md5(payload.password);
     const user = new Users(payload);
     await user.save();
-    res.json({ status: 'ok', message: 'user created' });
+    res.json({ status: 200, message: 'user created' });
   } catch(error) {
     console.log(error.message);
   }
@@ -64,7 +65,7 @@ app.post('/login', async(req, res) => {
       iss: user._id,
       username: user.username,
     }, SECRET);
-    res.json({status: 'ok', message: 'login success', token});
+    res.json({status: 200, message: 'login success', token});
   } else {
     res.json({status: 'error', message: 'user not found'});
   }
@@ -274,6 +275,28 @@ app.get('/advice', async(req, res) => {
         }
       )
     })
+  } catch(error) {
+    res.json({status: 'error', message: error.message});
+  }
+});
+
+// เพิ่ม Avatar
+app.post('/avatars', async(req, res) => {
+  try {
+    const payload = req.body;
+    const avatar = new Avatars(payload);
+    await avatar.save();
+    res.json({status: 201, message: 'create success'});
+  } catch(error) {
+    res.json({status: 'error', message: error.message});
+  }
+});
+
+// ดึงข้อมูล Avatar ทั้งหมด
+app.get('/avatars', async(req, res) => {
+  try {
+    const avatars = await Avatars.find({});
+    res.json({status: 200, avatars});
   } catch(error) {
     res.json({status: 'error', message: error.message});
   }
