@@ -323,7 +323,7 @@ app.post('/followings', async(req, res) => {
     const followings = new Followings(payload);
     await followings.save();
 
-    res.json({status: 201, message: 'create success'});
+    res.json({status: 200, message: 'create success'});
   } catch(error) {
     res.json({status: 'error', message: error.message});
   }
@@ -360,6 +360,23 @@ app.get('/followings', async(req, res) => {
     ])
 
     res.json({status: 200, followings});
+  } catch(error) {
+    res.json({status: 'error', message: error.message});
+  }
+});
+
+// ค้นหาผู้ใช้จากชื่อ
+app.get('/user/:username', async(req, res) => {
+  try {
+    const username = req.params.username;
+
+    const user = await Users.findOne({username: username});
+    if(user) {
+      userDetails = {username: user.username, image: user.image}
+      res.json({status: 200, userDetails});
+    } else {
+      res.json({status: 'error', message: 'username not found'});
+    }
   } catch(error) {
     res.json({status: 'error', message: error.message});
   }
