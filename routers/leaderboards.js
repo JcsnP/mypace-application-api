@@ -3,8 +3,9 @@ var router = express.Router();
 const md5 = require('md5');
 const jwt = require('jsonwebtoken');
 const SECRET = process.env.SECRET;
+const moment = require('moment');
 
-const Users = require('../schemas/Advices');
+const Users = require('../schemas/Users');
 const Paces = require('../schemas/Paces');
 
 // ดึงข้อมูลการเดิน สัปดาห์ย้อนหลัง
@@ -30,14 +31,15 @@ router.get('/leaderboard', async(req, res) => {
     .project({
       '_id': 0,
       'details': 1,
-      'user.username': 1
+      'user.username': 1,
+      'user.image': 1
     })
     .sort({'details.paces': -1})
     .limit(10)
     .exec();
     res.json({status: 200, userPaces});
   } catch(error) {
-    res.json({status: 500, message: error});
+    res.json({status: 500, message: error.message});
   }
 });
 

@@ -38,7 +38,7 @@ app.use(function(req, res, next) {
 app.use('/', usersRouter);
 app.use('/', advicesRouter);
 app.use('/', pacesRouter);
-app.use('/b', badgesRouter);
+app.use('/', badgesRouter);
 app.use('/', leaderboardRouter);
 app.use('/', avatarsRouter);
 app.use('/', followingsRouter);

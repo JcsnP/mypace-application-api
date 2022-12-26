@@ -13,6 +13,7 @@ router.post('/paces', async(req, res) => {
     var iss = jwt.verify(token, SECRET).iss;
 
     const payload = req.body;
+    payload.userId = iss;
     const pace = new Paces(payload);
 
     // เช็คก่อนว่าบันทึกไว้แล้วหรือยัง

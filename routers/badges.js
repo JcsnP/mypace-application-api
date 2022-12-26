@@ -4,7 +4,7 @@ const md5 = require('md5');
 const jwt = require('jsonwebtoken');
 const SECRET = process.env.SECRET;
 
-const Users = require('../schemas/Advices');
+const Users = require('../schemas/Users');
 const Badges = require('../schemas/Badges');
 
 // ดึงข้อมูล badge ของผู้ใช้คนใดคนนึง

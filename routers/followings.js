@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+const mongoose = require('mongoose');
 const md5 = require('md5');
 const jwt = require('jsonwebtoken');
 const SECRET = process.env.SECRET;
