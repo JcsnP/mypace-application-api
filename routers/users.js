@@ -56,7 +56,8 @@ router.get('/users/me', async(req, res) => {
     const token = req.headers.authorization.split(' ')[1];
     var iss = jwt.verify(token, SECRET).iss;
     const user = await Users.findOne({_id: iss});
-    res.json({status: 200, user});
+    const {_id, username, email, image, information, badges} = user;
+    res.json({status: 200, user: {_id, username, email, image, badges, information}});
   } catch(error) {
     res.json({status: 204, message: 'invalid token', error: error});
   }

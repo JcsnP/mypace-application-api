@@ -7,40 +7,90 @@ const moment = require('moment');
 
 const Users = require('../schemas/Users');
 const Paces = require('../schemas/Paces');
+const Following = require('../schemas/Followings');
 
-// ดึงข้อมูลการเดิน สัปดาห์ย้อนหลัง
+// ดึงข้อมูลการเดิน สัปดาห์ย้อนหลังของเพื่อน
 router.get('/leaderboard', async(req, res) => {
-  //  console.log(new Date(moment().subtract(1, 'days')).toLocaleDateString());
-  /*
-    {
-      '$match': {'date': yesterday_date}
-    },
-  */
+  // console.log(new Date(moment().subtract(7, 'days')).toLocaleDateString());
   try {
-    const yesterday_date = await new Date(moment().subtract(1, 'days')).toLocaleDateString();
-    const userPaces = await Paces.aggregate([
+    let following= [];
+    const token = req.headers.authorization.split(' ')[1];
+    var iss = jwt.verify(token, SECRET).iss;
+
+    // หาเพื่อนทั้งหมด
+    let following_list = [];
+    following = await Following.find({userId: iss});
+    following.map(item => {following_list.push(item.followingId)})
+
+    // return res.json({user: {following}})
+    const leaderboard = await Users.aggregate([
+      {
+        '$match': {
+          '_id': {'$in': following_list}
+        }
+      },
+      {
+        '$project': {
+          'email': 0,
+          'password': 0,
+          'information': 0,
+          'createdAt': 0,
+          'updatedAt': 0
+        }
+      },
       {
         '$lookup': {
-          'from': Users.collection.name,
-          'localField': 'userId',
-          'foreignField': '_id',
-          'as': 'user'
+          'from': Paces.collection.name,
+          'localField': '_id',
+          'foreignField': 'userId',
+          'as': 'pacesHistory'
         }
+      },
+      {
+        '$unwind': '$pacesHistory'
+      },
+      {
+        '$group': {
+          '_id': '$_id',
+          'username': {'$first': '$username'},
+          'image': {'$first': '$image'},
+          'totalPaces': {'$sum': '$pacesHistory.details.paces'}
+        }
+      },
+      {
+        '$sort': {'totalPaces': -1}
       }
     ])
-    .project({
-      '_id': 0,
-      'details': 1,
-      'user.username': 1,
-      'user.image': 1
-    })
-    .sort({'details.paces': -1})
-    .limit(10)
-    .exec();
-    res.json({status: 200, userPaces});
+
+    return res.json({status: 200, leaderboard});
   } catch(error) {
-    res.json({status: 500, message: error.message});
+    console.log(error);
   }
 });
 
 module.exports = router;
+
+/*
+const leaderboard = await Paces.aggregate([
+  {
+    '$match': {
+      'userId': {'$in': following_list}
+    }
+  },
+  {
+    '$project': {
+      '_id': 1,
+      'createdAt': 0,
+      'updatedAt': 0
+    },
+  },
+  {
+    '$lookup': {
+      'from': Users.collection.name,
+      'localField': 'userId',
+      'foreignField': '_id',
+      'as': 'pacesHistory'
+    }
+  }
+])
+*/
