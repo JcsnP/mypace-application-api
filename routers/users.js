@@ -86,7 +86,7 @@ router.get('/user/:username', async(req, res) => {
       userDetails = {username: user.username, image: user.image}
       res.json({status: 200, userDetails});
     } else {
-      res.json({status: 'error', message: 'username not found'});
+      res.json({status: 404, message: 'username not found'});
     }
   } catch(error) {
     res.json({status: 'error', message: error.message});
