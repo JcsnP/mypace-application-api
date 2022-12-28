@@ -48,46 +48,73 @@ router.get('/users/me/badges', async(req, res) => {
 });
 */
 
-// ดึงข้อมูล badge ของผู้ใช้คนใดคนนึง พร้อมสถานะ
-router.get('/users/me/badges', async(req, res) => {
+// ดึงข้อมูล badge ของผู้ใช้คนใดคนนึง [ที่ปลดล็อกแล้ว]
+router.get('/users/me/badges/unlocked', async(req, res) => {
   try {
     const token = req.headers.authorization.split(' ')[1];
     var iss = jwt.verify(token, SECRET).iss;
 
-    const badge = await Badges.aggregate([
+    const unlockedBadges = await Badges.aggregate([
       {
         '$lookup': {
           'from': UserBadges.collection.name,
-          'localField': "_id",
-          'foreignField': "badge_id",
-          'as': "badge"
-       }
-      },
-      {
-        '$unwind': {'path': '$badge', 'preserveNullAndEmptyArrays': true}
+          'localField': '_id',
+          'foreignField': 'badge_id',
+          'as': 'badge'
+        }
       },
       {
         '$match': {
-          '$or': [
-            {'badge.user_id': mongoose.Types.ObjectId(iss)},
-            {'$and': [
-              {'badge': {'$exists': false}},
-              {'badge.user_id': {'$ne': mongoose.Types.ObjectId(iss)}}
-            ]},
-          ]
+          'badge.user_id': mongoose.Types.ObjectId(iss)
         }
       },
       {
         '$project': {
-          '_id': 0,
-          'createdAt': 0,
+          'badge': 0,
           'updatedAt': 0,
-          'badge.createdAt': 0,
-          'badge.updatedAt': 0,
+          'createdAt': 0,
+          'type': 0
         }
       }
-    ])
-    res.json({status: 200, badges: badge});
+    ]);
+
+    res.json({status: 200, unlockedBadges});
+  } catch(error) {
+    res.json({status: 404, message: 'can\'t find user\'s badges', error: error.message});
+  }
+});
+
+// ดึงข้อมูล badge ของผู้ใช้คนใดคนนึง [ที่ยังไม่ปลดล็อก]
+router.get('/users/me/badges/locked', async(req, res) => {
+  try {
+    const token = req.headers.authorization.split(' ')[1];
+    var iss = jwt.verify(token, SECRET).iss;
+    
+    const lockedBadges = await Badges.aggregate([
+      {
+        '$lookup': {
+          'from': UserBadges.collection.name,
+          'localField': '_id',
+          'foreignField': 'badge_id',
+          'as': 'badge'
+        }
+      },
+      {
+        '$match': {
+          'badge.user_id': {'$not': {'$eq': mongoose.Types.ObjectId(iss)}}
+        }
+      },
+      {
+        '$project': {
+          'badge': 0,
+          'updatedAt': 0,
+          'createdAt': 0,
+          'type': 0
+        }
+      }
+    ]);
+
+    res.json({status: 200, lockedBadges});
   } catch(error) {
     res.json({status: 404, message: 'can\'t find user\'s badges', error: error.message});
   }
