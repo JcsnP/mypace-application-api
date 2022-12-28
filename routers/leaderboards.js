@@ -19,7 +19,7 @@ router.get('/leaderboard', async(req, res) => {
 
     // หาเพื่อนทั้งหมด
     let following_list = [];
-    following = await Following.find({userId: iss});
+    following = await Following.find({user_id: iss});
     following.map(item => {following_list.push(item.followingId)})
 
     // return res.json({user: {following}})
@@ -42,7 +42,7 @@ router.get('/leaderboard', async(req, res) => {
         '$lookup': {
           'from': Paces.collection.name,
           'localField': '_id',
-          'foreignField': 'userId',
+          'foreignField': 'user_id',
           'as': 'pacesHistory'
         }
       },

@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 const ObjectId = Schema.ObjectId;
 
 const pacesSchema = new Schema({
-  userId: ObjectId,
+  user_id: ObjectId,
   date: String,
   details: {
     paces: Number,

@@ -13,11 +13,11 @@ router.post('/paces', async(req, res) => {
     var iss = jwt.verify(token, SECRET).iss;
 
     const payload = req.body;
-    payload.userId = iss;
+    payload.user_id = iss;
     const pace = new Paces(payload);
 
     // เช็คก่อนว่าบันทึกไว้แล้วหรือยัง
-    const paced = await Paces.findOne({userId: iss, date: payload.date});
+    const paced = await Paces.findOne({user_id: iss, date: payload.date});
     if(paced) {
       return res.json({status: 409, message: 'pace is already saved.'});
     }
@@ -40,7 +40,7 @@ router.get('/users/paces', async(req, res) => {
   try {
     const token = req.headers.authorization.split(' ')[1];
     var iss = jwt.verify(token, SECRET).iss;
-    const userPaces = await Paces.find({userId: iss});
+    const userPaces = await Paces.find({user_id: iss});
 
     // response to client
     res.json({status: 200, history: userPaces});
@@ -57,7 +57,7 @@ router.get('/users/paces/:format', async(req, res) => {
     const token = req.headers.authorization.split(' ')[1];
     var iss = jwt.verify(token, SECRET).iss;
     if(format === 'life') {
-      const life = await Paces.find({userId: iss});
+      const life = await Paces.find({user_id: iss});
       let all = 0;
       life.map(item => {
         all += item.details.paces;

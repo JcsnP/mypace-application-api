@@ -22,7 +22,10 @@ router.post('/followings', async(req, res) => {
       return;
     }
 
-    payload.userId = iss;
+    // ดูก่อนว่าติดตามแล้วยัง
+    // ค่อยทำ
+
+    payload.user_id = iss;
     payload.followingId = user._id;
 
     const followings = new Followings(payload);
@@ -39,12 +42,12 @@ router.get('/followings', async(req, res) => {
   try {
     const token = req.headers.authorization.split(' ')[1];
     var iss = jwt.verify(token, SECRET).iss;
-    // const followings = await Followings.find({userId: iss});
+    // const followings = await Followings.find({user_id: iss});
 
     const followings = await Followings.aggregate([
       {
         '$match': {
-          'userId': mongoose.Types.ObjectId(iss)
+          'user_id': mongoose.Types.ObjectId(iss)
         }
       },
       {
