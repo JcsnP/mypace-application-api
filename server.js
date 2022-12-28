@@ -18,6 +18,7 @@ const badgesRouter = require('./routers/badges');
 const leaderboardRouter = require('./routers/leaderboards');
 const avatarsRouter = require('./routers/avatars');
 const followingsRouter = require('./routers/followings');
+const userBadges = require('./routers/user_badges');
 
 mongoose.connect(MYPACE_MONGODB, { useNewUrlParser: true });
 mongoose.connection.on('error', (err) => {
@@ -42,6 +43,7 @@ app.use('/', badgesRouter);
 app.use('/', leaderboardRouter);
 app.use('/', avatarsRouter);
 app.use('/', followingsRouter);
+app.use('/', userBadges);
 
 const PORT = 3000;
 app.listen(PORT, () => {

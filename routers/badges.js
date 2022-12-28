@@ -7,18 +7,6 @@ const SECRET = process.env.SECRET;
 const Users = require('../schemas/Users');
 const Badges = require('../schemas/Badges');
 
-// ดึงข้อมูล badge ของผู้ใช้คนใดคนนึง
-router.get('/users/me/badges', async(req, res) => {
-  try {
-    const token = req.headers.authorization.split(' ')[1];
-    var iss = jwt.verify(token, SECRET).iss;
-    const badge = await Users.findOne({_id: iss});
-    res.json({status: 200, badges: badge.badges});
-  } catch(error) {
-    res.json({status: 'error', message: 'can\'t find user\'s badges'});
-  }
-});
-
 // สร้าง badge
 router.post('/badges', async(req, res) => {
   try {

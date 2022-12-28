@@ -69,28 +69,3 @@ router.get('/leaderboard', async(req, res) => {
 });
 
 module.exports = router;
-
-/*
-const leaderboard = await Paces.aggregate([
-  {
-    '$match': {
-      'userId': {'$in': following_list}
-    }
-  },
-  {
-    '$project': {
-      '_id': 1,
-      'createdAt': 0,
-      'updatedAt': 0
-    },
-  },
-  {
-    '$lookup': {
-      'from': Users.collection.name,
-      'localField': 'userId',
-      'foreignField': '_id',
-      'as': 'pacesHistory'
-    }
-  }
-])
-*/
