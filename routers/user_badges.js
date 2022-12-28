@@ -70,7 +70,10 @@ router.get('/users/me/badges', async(req, res) => {
         '$match': {
           '$or': [
             {'badge.user_id': mongoose.Types.ObjectId(iss)},
-            {'badge': {'$exists': false}},
+            {'$and': [
+              {'badge': {'$exists': false}},
+              {'badge.user_id': {'$ne': mongoose.Types.ObjectId(iss)}}
+            ]},
           ]
         }
       },

@@ -20,7 +20,7 @@ router.get('/leaderboard', async(req, res) => {
     // หาเพื่อนทั้งหมด
     let following_list = [];
     following = await Following.find({user_id: iss});
-    following.map(item => {following_list.push(item.followingId)})
+    following.map(item => {following_list.push(item.following_id)})
 
     // return res.json({user: {following}})
     const leaderboard = await Users.aggregate([

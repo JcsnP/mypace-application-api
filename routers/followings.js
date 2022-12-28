@@ -15,18 +15,16 @@ router.post('/followings', async(req, res) => {
     var iss = jwt.verify(token, SECRET).iss;
     const payload = req.body;
 
-    // ค้นหาก่อนว่ามีผู้ใช้คนนั้นมั้ย
+    // ค้นหาก่อนว่ามีผู้ใช้คนนั้นมั้ย ถ้าไม่มีก็ไม่ให้ทำไรต่อ
     const user = await Users.findOne({username: payload.following_name});
-    if(!user) {
+    console.log(user)
+    if(user === null) {
       res.json({status: 404, message: 'user not found'});
       return;
     }
 
-    // ดูก่อนว่าติดตามแล้วยัง
-    // ค่อยทำ
-
     payload.user_id = iss;
-    payload.followingId = user._id;
+    payload.following_id = user._id;
 
     const followings = new Followings(payload);
     await followings.save();
@@ -53,7 +51,7 @@ router.get('/followings', async(req, res) => {
       {
         '$lookup': {
           'from': Users.collection.name,
-          'localField': 'followingId',
+          'localField': 'following_id',
           'foreignField': '_id',
           'as': 'details'
         }

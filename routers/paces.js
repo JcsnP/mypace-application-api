@@ -40,7 +40,7 @@ router.get('/users/paces', async(req, res) => {
   try {
     const token = req.headers.authorization.split(' ')[1];
     var iss = jwt.verify(token, SECRET).iss;
-    const userPaces = await Paces.find({user_id: iss});
+    const userPaces = await Paces.find({user_id: iss}).sort({date: -1});
 
     // response to client
     res.json({status: 200, history: userPaces});
