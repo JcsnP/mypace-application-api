@@ -49,7 +49,6 @@ router.get('/users/me/badges', async(req, res) => {
 */
 
 // ดึงข้อมูล badge ของผู้ใช้คนใดคนนึง พร้อมสถานะ
-/*
 router.get('/users/me/badges', async(req, res) => {
   try {
     const token = req.headers.authorization.split(' ')[1];
@@ -90,7 +89,6 @@ router.get('/users/me/badges', async(req, res) => {
     res.json({status: 404, message: 'can\'t find user\'s badges', error: error.message});
   }
 });
-*/
 
 // สร้าง badge ของผู้ใช้คนใดคนนึง
 router.post('/users/me/badges', async(req, res) => {
