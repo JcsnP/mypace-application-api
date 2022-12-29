@@ -50,6 +50,12 @@ router.get('/leaderboard', async(req, res) => {
         '$unwind': '$pacesHistory'
       },
       {
+        '$sort': {'pacesHistory.date': -1}
+      },
+      {
+        '$limit': 7
+      },
+      {
         '$group': {
           '_id': '$_id',
           'username': {'$first': '$username'},
